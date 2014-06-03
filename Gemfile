@@ -29,7 +29,7 @@ group :test do
   gem 'faker'
   gem 'fakes'
   gem 'rspec'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 2.11.0'
   gem 'rspec-given'
   gem 'rack-test'
   gem 'simplecov', '~> 0.7.1'

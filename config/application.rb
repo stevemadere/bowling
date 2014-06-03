@@ -58,5 +58,9 @@ module Bowling
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # Do not care about internationalization and do not want to see annoying
+    # warnings when running rspec
+    config.i18n.enforce_available_locales = false
   end
 end
