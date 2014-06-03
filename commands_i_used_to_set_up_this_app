@@ -1,0 +1,4 @@
+rails new bowling
+cd bowling
+rails generate scaffold Player name:string
+rails generate rspec:install
