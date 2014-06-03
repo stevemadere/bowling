@@ -1,5 +1,15 @@
 Bowling::Application.routes.draw do
+
   resources :players
+
+  resources :games do
+    resources :player_games do
+      get :roll, :score, :on => :member
+      resources :frames, :only => [] do
+        get :roll, :score, :on => :member
+      end
+    end
+  end
 
 
   # The priority is based upon order of creation:
