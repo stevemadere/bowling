@@ -22,6 +22,19 @@ end
 
 gem 'jquery-rails'
 
+
+group :test do
+  gem 'database_cleaner', '1.0.1'
+  gem 'factory_girl_rails'
+  gem 'faker'
+  gem 'fakes'
+  gem 'rspec'
+  gem 'rspec-rails'
+  gem 'rspec-given'
+  gem 'rack-test'
+  gem 'simplecov', '~> 0.7.1'
+end
+
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
