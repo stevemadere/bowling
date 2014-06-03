@@ -1,4 +1,7 @@
 class PlayersController < ApplicationController
+
+  # TODO:  Make sure REST responses include URI
+  #
   respond_to :json
   # GET /players.json
   def index
@@ -35,8 +38,9 @@ class PlayersController < ApplicationController
   # PUT /players/1.json
   def update
     @player = Player.find(params[:id])
+
     if @player.update_attributes(params[:player])
-      respond_with @player
+      head :no_content
     else
       respond_with @player.errors, status: :unprocessable_entity
     end
@@ -44,12 +48,11 @@ class PlayersController < ApplicationController
 
   # DELETE /players/1.json
   def destroy
-    @player = Player.find(params[:id])
+    # idempotence demands that we ignore record-not-found errors
+    @player = Player.find_by_id(params[:id]) 
     if @player
       @player.destroy
-      respond_with @player
-    else
-      respond_with nil
     end
+    head :no_content 
   end
 end
