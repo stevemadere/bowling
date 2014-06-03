@@ -1,83 +1,55 @@
 class PlayersController < ApplicationController
-  # GET /players
+  respond_to :json
   # GET /players.json
   def index
     @players = Player.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @players }
-    end
+    respond_with @players
   end
 
   # GET /players/1
   # GET /players/1.json
   def show
     @player = Player.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @player }
-    end
+    respond_with @player
   end
 
-  # GET /players/new
-  # GET /players/new.json
+  # GET  /players/new.json
   def new
     @player = Player.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @player }
-    end
+    respond_with @player
   end
 
-  # GET /players/1/edit
-  def edit
-    @player = Player.find(params[:id])
-  end
-
-  # POST /players
   # POST /players.json
   def create
+    Rails.logger.error("in create")
     @player = Player.new(params[:player])
-
-    respond_to do |format|
-      if @player.save
-        format.html { redirect_to @player, notice: 'Player was successfully created.' }
-        format.json { render json: @player, status: :created, location: @player }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @player.errors, status: :unprocessable_entity }
-      end
+    Rails.logger.error("after new")
+    if @player.save
+      Rails.logger.error("after save")
+      respond_with @player, status: :created
+    else
+      respond_with @player.errors, status: :unprocessable_entity
     end
   end
 
-  # PUT /players/1
   # PUT /players/1.json
   def update
     @player = Player.find(params[:id])
-
-    respond_to do |format|
-      if @player.update_attributes(params[:player])
-        format.html { redirect_to @player, notice: 'Player was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: @player.errors, status: :unprocessable_entity }
-      end
+    if @player.update_attributes(params[:player])
+      respond_with @player
+    else
+      respond_with @player.errors, status: :unprocessable_entity
     end
   end
 
-  # DELETE /players/1
   # DELETE /players/1.json
   def destroy
     @player = Player.find(params[:id])
-    @player.destroy
-
-    respond_to do |format|
-      format.html { redirect_to players_url }
-      format.json { head :no_content }
+    if @player
+      @player.destroy
+      respond_with @player
+    else
+      respond_with nil
     end
   end
 end

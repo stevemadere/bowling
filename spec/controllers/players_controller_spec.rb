@@ -9,10 +9,11 @@ describe PlayersController, :controllers do
   #end
   #
   describe "POST create" do
-    Given(:player_attributes) { attributes_for(:player) } # FIXME check syntax
+    Given(:player_attributes) { attributes_for(:player) }
     Given!(:previous_player_count) { Player.count }
-    When(:created_player) { post(:create, player_attributes, format: json) }
-    Then { Player.count.should == previous_player_count + 1 }
-    And { puts created_player.to_json }
+    When(:response) { post(:create, {player: player_attributes, format: :json}) }
+    Then { response.status.should eq(201) }
+    And { Player.count.should == previous_player_count + 1 }
+    And { (JSON.parse response.body)["name"].should eq(player_attributes[:name]) }
   end
 end
