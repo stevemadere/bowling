@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  frame_id: 1
+  roll_number: 1
+
+two:
+  frame_id: 1
+  roll_number: 1

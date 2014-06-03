@@ -2,3 +2,7 @@ rails new bowling
 cd bowling
 rails generate scaffold Player name:string
 rails generate rspec:install
+rails g model PlayerGame player_id:integer game_id:integer
+rails g model Frame player_game_id:integer frame_number:integer
+rails g model Roll frame_id:integer roll_number:integer
+rails g controller Game
