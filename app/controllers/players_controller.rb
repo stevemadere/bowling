@@ -51,12 +51,12 @@ class PlayersController < ApplicationController
 
   # PUT /players/1.json
   def update
-    game # check that any supplied game_d is valid before updating the Player
+    game # check that any supplied game_id is valid before updating the Player
     @player = Player.find(params[:id])
 
     if @player.update_attributes(params[:player])
-      if game && !game.players.include?(player)
-        game.players << player
+      if game && !game.players.include?(@player)
+        game.players << @player
         game.save
       end
       head :no_content
@@ -82,9 +82,16 @@ class PlayersController < ApplicationController
   # DELETE /players/1.json
   def destroy
     # idempotence demands that we ignore record-not-found errors
-    @player = Player.find_by_id(params[:id]) 
-    if @player
-      @player.destroy
+    if game
+      @player_game = game.player_games.find_by_player_id(params[:id])
+      if @player_game
+        @player_game.destroy
+      end
+    else
+      @player = Player.find_by_id(params[:id]) 
+      if @player
+        @player.destroy
+      end
     end
     head :no_content 
   end
