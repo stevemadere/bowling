@@ -33,9 +33,17 @@ class PlayerGame < ActiveRecord::Base
 
   # Determines if enough rolls have been recorded to consider the game
   # finally scorable.
-  def finished
+  def finished?
     frame_list = game_frames.to_a
     frame_list.size == 10 && frame_list.none? { |frame|  frame.score.nil? }
+  end
+
+  def final_score
+    if finished?
+      self.score
+    else
+      nil
+    end
   end
 
   # Record a roll within a specific frame of the game

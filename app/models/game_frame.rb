@@ -81,12 +81,12 @@ class GameFrame < ActiveRecord::Base
 
   protected
     def next_frame
-      return nil if frame_number > 9
+      return nil if frame_number == 10
       player_game.game_frames.where(:frame_number => frame_number + 1).first
     end
 
     def second_roll
-      (frame_number == 10 || roll1 < 10) ? roll2 : next_frame.roll1
+      ( self.strike? && self.frame_number != 10 ) ? next_frame.roll1 : self.roll2 
     end
 
 end
