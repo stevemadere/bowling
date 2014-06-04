@@ -5,7 +5,7 @@ Bowling::Application.routes.draw do
   resources :games do
     resources :player_games do
       get :roll, :score, :on => :member
-      resources :frames, :only => [] do
+      resources :game_frames, :only => [] do
         get :roll, :score, :on => :member
       end
     end
