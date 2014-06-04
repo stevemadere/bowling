@@ -19,7 +19,7 @@ about a day's effort to fix that with devise.
 To create a Game, POST to the route "/games".  No required parameters.
 
 To create a Player, POST to the route "/players" with params:
-* name
+  * name
 
 Henceforth in this document, an all-caps route component is meant to be a substitutable parameter.  e.g.: GAME_ID should be replaced with the id returned in the serialized Game object.
 
