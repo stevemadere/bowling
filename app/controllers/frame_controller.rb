@@ -1,2 +1,0 @@
-class FrameController < ApplicationController
-end
