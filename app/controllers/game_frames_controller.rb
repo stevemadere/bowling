@@ -1,0 +1,2 @@
+class GameFramesController < ApplicationController
+end
