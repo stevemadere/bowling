@@ -197,6 +197,66 @@ describe GameFrame, :integration do
   end
 
   describe "#score" do
+    context "perfect game" do
+      Given do
+        frames.each do |f|
+            f.roll1 = 10
+            if f.frame_number == 10
+              f.roll2 = 10
+              f.roll3  = 10
+            end
+            f.save!
+        end
+      end
+      describe "total" do
+        When(:game_score) { player_game.final_score }
+        Then { game_score.should eq(300) }
+        Then { frames.all? { |f| f.score.should eq(30) } }
+      end
+    end
+
+    context "perfectly awful game" do
+      Given do
+        frames.each do |f|
+          f.roll1 = f.roll2  = 0
+          f.save!
+        end
+      end
+      When(:game_score) { player_game.final_score }
+      Then { game_score.should eq(0) }
+      Then { frames.all? { |f| f.score.should eq(0) } }
+    end
+
+    context "frustrating game" do
+      Given do
+        frames.each do |f|
+          f.roll1 = 5
+          f.roll2 = 4
+          f.save!
+        end
+      end
+      When(:game_score) { player_game.final_score }
+      Then { game_score.should eq(90) }
+      Then { frames.all? { |f| f.score.should eq(9) } }
+    end
+
+    context "improving spares", :now do
+      Given do
+        frames.each do |f|
+          f.roll1 = f.frame_number
+          f.roll2 = 10 - f.roll1
+          if (f.terminal_frame?)
+            f.roll3 = 1
+          end
+          f.save!
+        end
+
+      end
+      When(:game_score) { player_game.final_score }
+      Then { game_score.should eq(100+ ((1..10).sum)) }
+      Then { frames.all? { |f| f.score.should eq(10+(f.terminal_frame? ? 1: (f.frame_number+1))) } }
+
+    end
   end
 end
 
