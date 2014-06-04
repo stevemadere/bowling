@@ -2,12 +2,10 @@ Bowling::Application.routes.draw do
 
   resources :players
 
-  resources :games do
-    resources :player_games do
-      get :roll, :score, :on => :member
-      resources :game_frames, :only => [] do
-        get :roll, :score, :on => :member
-      end
+  resources :games do # /games
+    resources :players do # /games/GAME_ID/players
+      get :add, :on => :member
+      resources :game_frames # /games/GAME_ID/players/PLAYER_ID/game_frames
     end
   end
 

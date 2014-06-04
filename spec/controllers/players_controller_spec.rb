@@ -9,31 +9,80 @@ describe PlayersController, :controllers do
   #  sign_in user
   #end
   #
+  Given!(:game) { Game.create }
+  Given(:invalid_game_id) { Game.maximum(:id) + 1000 }
+
   describe "POST create" do
     Given(:player_attributes) { attributes_for(:player) }
     Given!(:previous_player_count) { Player.count }
-    When(:response) { post(:create, {player: player_attributes, format: :json}) }
-    Then { response.status.should eq(201) }
-    And { Player.count.should == previous_player_count + 1 }
-    And { (JSON.parse response.body)["name"].should eq(player_attributes[:name]) }
+
+    context "no game" do
+      When(:response) { post(:create, {player: player_attributes, format: :json}) }
+      Then { response.status.should eq(201) }
+      And { Player.count.should == previous_player_count + 1 }
+      And { JSON.parse(response.body)["name"].should eq(player_attributes[:name]) }
+    end
+
+    context "within game" do
+      When(:response) { post(:create, {player: player_attributes, game_id: game.id, format: :json}) }
+      Then { response.status.should eq(201) }
+      And { Player.count.should == previous_player_count + 1 }
+      And { JSON.parse(response.body)["name"].should eq(player_attributes[:name]) }
+      And { game.players.size > 0 && game.players.any? { |p| p.name.should eq(player_attributes[:name])} } 
+    end
+
+    context "invalid game id" do
+      When(:response) { post(:create, {player: player_attributes, game_id: invalid_game_id, format: :json}) }
+      Then { response.status.should eq(404) }
+      And { Player.count.should == previous_player_count }
+    end
+
   end
 
-  describe "GET index" do
-    Given!(:created_players) { create_list(:player, 3) }
+  context "multi-player" do
+    Given!(:created_players) { create_list(:player, 5) }
     Given!(:players_from_db) { Player.all.to_a }
-    When(:response) { get(:index, format: :json) }
-    Then { response.status.should eq(200) }
-    And { (Set.new((JSON.parse response.body).map {|p| [p["id"],p["name"]]})).should eq(Set.new(players_from_db.map {|p| [p.id,p.name]})) }
-  end
+    Given!(:players_in_game) { players_from_db.first(3) }
+    Given { players_in_game.each { |p| game.players << p } ; game.save}
+    describe "GET index" do
+      context "no game" do
+        When(:response) { get(:index, format: :json) }
+        Then { response.status.should eq(200) }
+        And { (Set.new(JSON.parse(response.body).map {|p| [p["id"],p["name"]]})).should eq(Set.new(players_from_db.map {|p| [p.id,p.name]})) }
+      end
 
-  describe "GET show" do
-    Given!(:created_players) { create_list(:player, 3) }
-    Given!(:players_from_db) { Player.all.to_a }
-    Given(:chosen_player) { players_from_db[2] }
-    When(:response) { get(:show, {id: chosen_player.id, format: :json}) }
-    Then { response.status.should eq(200) }
-    And { (JSON.parse response.body)["name"].should eq(chosen_player.name) }
-    And { (JSON.parse response.body)["id"].should eq(chosen_player.id) }
+      context "within game" do
+        When(:response) { get(:index, game_id: game.id, format: :json) }
+        Then { response.status.should eq(200) }
+        And { (Set.new(JSON.parse(response.body).map {|p| [p["id"],p["name"]]})).should eq(Set.new(players_in_game.map {|p| [p.id,p.name]})) }
+        Then { JSON.parse(response.body).each { |p| p.should(have_key('current_score'))  && p.should(have_key('final_score')) } }
+      end
+      
+      context "invalid game id" do
+        When(:response) { get(:index, game_id: invalid_game_id, format: :json) }
+        Then { response.status.should eq(404) }
+      end
+
+    end
+
+    describe "GET show", :now do
+      Given(:player_in_game) { players_in_game[2] }
+      context "no game" do
+        Given(:chosen_player) { player_in_game }
+        When(:response) { get(:show, {id: chosen_player.id, format: :json}) }
+        Then { response.status.should eq(200) }
+        And { JSON.parse(response.body)["name"].should eq(chosen_player.name) }
+        And { JSON.parse(response.body)["id"].should eq(chosen_player.id) }
+      end
+      context "within game" do
+        Given(:chosen_player) { player_in_game }
+        When(:response) { get(:show, {id: chosen_player.id, game_id: game.id, format: :json}) }
+        Then { response.status.should eq(200) }
+        And { JSON.parse(response.body)["name"].should eq(chosen_player.name) }
+        And { JSON.parse(response.body)["id"].should eq(chosen_player.id) }
+        And { JSON.parse(response.body).should have_key('current_score') }
+      end
+    end
   end
 
   describe "PUT update" do
