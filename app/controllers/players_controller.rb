@@ -1,5 +1,5 @@
 class PlayersController < ApplicationController
-  around_filter :handle_record_not_found
+  include RailsRemediation::ProperControllerResponses
 
   # TODO:  Make sure REST responses include URI
   #
@@ -106,10 +106,4 @@ class PlayersController < ApplicationController
       @game ||= (params.include?(:game_id) ? Game.find(params[:game_id]) : nil)
     end
 
-    def handle_record_not_found
-      yield
-      rescue ActiveRecord::RecordNotFound => e
-        respond_with({ errors: [ e.message ] },
-                     { location: nil, status: :not_found })
-    end
 end
