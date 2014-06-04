@@ -4,6 +4,7 @@ class PlayersController < ApplicationController
   # TODO:  Make sure REST responses include URI
   #
   respond_to :json
+
   # GET /players.json
   def index
     if game
@@ -74,6 +75,7 @@ class PlayersController < ApplicationController
         game.players << @player
         game.save
       end
+      head :no_content
     else
       head :no_content, status: :unprocessable_entity
     end

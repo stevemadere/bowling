@@ -124,6 +124,40 @@ describe PlayersController, :controllers do
 
     end
 
+    describe "GET add", :now do
+      context "no game" do
+        Given(:chosen_player) { players_not_in_game.first }
+        When(:response) { get(:add, {id: chosen_player.id, format: :json}) }
+        Then { response.should raise_error(ActionController::RoutingError) }
+      end
+
+      context "within game" do
+
+        context "new player" do
+          Given(:chosen_player) { players_not_in_game.first }
+          When(:response) { get(:add, {id: chosen_player.id, game_id: game.id, format: :json}) }
+          Then { response.status.should eq(204) }
+          And { game.players.find_by_id(chosen_player.id).should_not be_nil }
+        end
+
+        context "existing player" do
+          Given(:chosen_player) { players_in_game.first }
+          When(:response) { get(:add, {id: chosen_player.id, game_id: game.id, format: :json}) }
+          Then { response.status.should eq(204) }
+          And { game.players.where(id: chosen_player.id).size.should eq(1) }
+        end
+
+        context "invalid game" do
+          Given(:chosen_player) { players_not_in_game.first }
+          When(:response) { get(:add, {id: chosen_player.id, game_id: invalid_game_id, format: :json}) }
+          Then { response.status.should eq(404) }
+        end
+
+      end
+
+    end
+
+
     describe "DELETE destroy" do
       Given!(:orig_players_from_db) { players_from_db }
       Given!(:orig_players_in_game) { players_in_game }
