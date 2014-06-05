@@ -45,8 +45,8 @@ class GameFrame < ActiveRecord::Base
     end
   end
 
-  def self.valid_frame_number?(frame_number)
-    frame_number >=1 && frame_number <= NUM_FRAMES
+  def self.valid_frame_number?(fn)
+    fn >=1 && fn <= NUM_FRAMES
   end
 
   # Calculates and returns the contribution of this frame to the overall 
