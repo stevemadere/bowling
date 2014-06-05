@@ -22,10 +22,10 @@ class GameFramesController < ApplicationController
 
   # PUT /games/GAME_ID/players/PLAYER_ID/game_frames/1.json
   def update
-    roll_member = "roll#{params[:roll_number]}".to_sym
+    roll_member = "roll#{required_param(:roll_number)}".to_sym
     update_params = HashWithIndifferentAccess.new
     update_params[:frame_number] = frame_number
-    update_params[roll_member] = params[:pins_toppled].to_i
+    update_params[roll_member] = required_param(:pins_toppled).to_i
     @game_frame = player_game.game_frames.find_by_frame_number(frame_number)
     success = false
     errors = nil
@@ -52,18 +52,18 @@ class GameFramesController < ApplicationController
     # Because it uses ActiveRecord#find, it will raise an exception if an
     # invalid game_id is specified.
     def game
-      @game ||= Game.find(params[:game_id])
+      @game ||= Game.find(required_param(:game_id))
     end
 
     def player_game
-      @player_game ||= game.player_games.find_by_player_id(params[:player_id])
-      raise ActiveRecord::RecordNotFound, "Player with id #{params[:player_id]} not not part of game #{game.id}" unless @player_game 
+      @player_game ||= game.player_games.find_by_player_id(required_param(:player_id))
+      raise ActiveRecord::RecordNotFound, "Player with id #{params[:player_id]} not part of game #{game.id}" unless @player_game 
       return @player_game
     end
 
     def frame_number
       return @frame_number if @frame_number
-      specified_frame_number = params[:id].to_i
+      specified_frame_number = required_param(:id).to_i
       raise InvalidParameter "Frame number #{specified_frame_number} is invalid" unless GameFrame.valid_frame_number?(specified_frame_number)
       @frame_number = specified_frame_number
     end
