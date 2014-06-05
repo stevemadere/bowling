@@ -34,6 +34,7 @@ group :test do
   gem 'rspec-given'
   gem 'rack-test'
   gem 'simplecov', '~> 0.7.1'
+  gem 'rest-client'
 end
 
 # To use ActiveModel has_secure_password
