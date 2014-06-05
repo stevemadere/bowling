@@ -190,6 +190,34 @@ describe PlayersController, :controllers do
         And { game.players.all.to_a.should eq(players_in_game.reject {|p| p.id == dead_player_id}) }
       end
     end
+
+    describe "index with scores", :integration do
+      Given(:pro_player) { players_in_game[0]}
+      Given(:lame_player) { players_in_game[1]}
+      Given(:non_rolling_player) { players_in_game[2]}
+      Given(:pro_player_game) { game.player_games.find_by_player_id(pro_player.id) }
+      Given(:lame_player_game) { game.player_games.find_by_player_id(lame_player.id) }
+      Given do
+          1.upto(10) do |frame_number| 
+            pro_player_game.game_frames.create(
+                frame_number: frame_number,
+                roll1: 10,
+                roll2: (frame_number<10 ? nil: 10),
+                roll3: (frame_number<10 ? nil: 10) )
+
+            lame_player_game.game_frames.create(
+                frame_number: frame_number,
+                roll1: 0,
+                roll2: 0,
+                roll3: nil )
+          end
+      end
+      When(:response) { get(:index, game_id: game.id, format: :json) }
+      Then { response.status.should eq(200) }
+      And { (Set.new(JSON.parse(response.body).map {|p| [p["id"],p["final_score"]]})).should eq(Set.new( [ [pro_player.id, 300  ], [ lame_player.id, 0] , [non_rolling_player.id, nil] ])) }
+
+    end
+
   end
 
 
