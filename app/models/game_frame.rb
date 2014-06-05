@@ -45,6 +45,9 @@ class GameFrame < ActiveRecord::Base
     end
   end
 
+  def self.valid_frame_number?(frame_number)
+    frame_number >=1 && frame_number <= NUM_FRAMES
+  end
 
   # Calculates and returns the contribution of this frame to the overall 
   # PlayerGame score. 
@@ -55,10 +58,10 @@ class GameFrame < ActiveRecord::Base
   def score
     begin
       return (strike? || spare?) ? score_extended_frame : roll1 + roll2
-    rescue TypeError # N + nil
-      raise unless e.message =~ /^nil can't be coerced/i
-    rescue NoMethodError # nil + N
-      raise unless e.message =~ /for nil:NilClass$/i
+    rescue TypeError => e1 # N + nil
+      raise unless e1.message =~ /^nil can't be coerced/i
+    rescue NoMethodError => e2 # nil + N
+      raise unless e2.message =~ /for nil:NilClass$/i
     end
     # if any precursor is nil, return nil
     return nil
