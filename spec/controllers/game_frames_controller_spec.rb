@@ -91,6 +91,16 @@ describe GameFramesController, :controllers do
         And { player_game.game_frames.find_by_frame_number(chosen_frame_number).roll1.should eq(pins_toppled) }
       end
 
+      pending "with invalid frame #" do
+        # I have no idea why this is not working
+        # trace output indicates the controller is doing the right thing
+        Given(:chosen_frame_number) { 20 }
+        Given(:chosen_player) { player_in_game }
+        Given(:pins_toppled) { 3 }
+        When(:response) { put(:update, {id: chosen_frame_number, game_id: game.id, player_id: chosen_player.id, roll_number: 1, pins_toppled: pins_toppled , format: :json}) }
+        Then { p response; response.status.should eq(422) }
+      end
+
       context "repeatedly on one frame" do
         Given(:chosen_frame_number) { existing_frame_number }
         Given(:chosen_player) { player_in_game }

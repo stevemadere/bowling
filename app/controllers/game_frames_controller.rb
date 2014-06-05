@@ -30,12 +30,10 @@ class GameFramesController < ApplicationController
     success = false
     errors = nil
     if !@game_frame
-      Rails.logger.error("creating GameFrame with #{update_params.to_json}")
       @game_frame = player_game.game_frames.create!(update_params)
       success = !@game_frame.nil?
       errors = "failed to create GameFRAME"
     else
-      Rails.logger.error("updating GameFrame #{@game_frame.to_json} with #{update_params.to_json}")
       success = @game_frame.update_attributes(update_params)
       @game_frame.save
       errors = @game_frame.errors
@@ -64,7 +62,7 @@ class GameFramesController < ApplicationController
     def frame_number
       return @frame_number if @frame_number
       specified_frame_number = required_param(:id).to_i
-      raise InvalidParameter "Frame number #{specified_frame_number} is invalid" unless GameFrame.valid_frame_number?(specified_frame_number)
+      raise InvalidParameter, "Frame number #{specified_frame_number} is invalid" unless GameFrame.valid_frame_number?(specified_frame_number)
       @frame_number = specified_frame_number
     end
 
